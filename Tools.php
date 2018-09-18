@@ -47,18 +47,40 @@ class Tools
     }
 
 
-    /**
-     * 手机号验证
-     * @param $mobile
-     * @return bool
-     */
+	/**
+	 * 手机号码验证、运营商检测
+	 * 移动号段：134,135,136,137,138,139,147,150,151,152,157,158,178,182,183,184,187,188
+	 * 联通号段：130,131,132,155,156,176,185,186
+	 * 电信号段：133,153,173,177,180,181,189,199
+	 * 运营商号段更新时间：2018-9-18
+	 *
+	 * @param $mobile
+	 * @return bool|string
+	 */
     public function isMobile($mobile)
     {
         if (!is_numeric($mobile)) {
             return false;
         }
-        $pattern = '#^13[\d]{9}$|^14[5,6,7,8,9]{1}\d{8}$|^15[^4]{1}\d{8}$|^16[6]{1}\d{8}$|^17[^4,^9]{1}\d{8}$|^18[\d]{9}$|19[8,9]{1}\d{8}#';
-        return preg_match($pattern, $mobile) ? true : false;
+        //正则匹配
+		$mobilePattern = '#^13[4,5,6,7,8,9]{1}\d{8}$|^14[7]{1}\d{8}$|^15[0,1,2,7,8]{1}\d{8}$|^17[8]{1}\d{8}$|^18[2,3,4,7,8]{1}\d{8}$|^19[8]{1}\d{8}#';
+		$unicomPattern = '#^13[0,1,2]{1}\d{8}$|^15[5,6]{1}\d{8}$|^17[6]{1}\d{8}$|^18[5,6]{1}\d{8}#';
+		$telecomPattern = '#^13[3]{1}\d{8}$|^15[3]{1}\d{8}$|^17[3,7]{1}\d{8}$|^18[0,1,9]{1}\d{8}$|^19[9]{1}\d{8}#';
+        $pattern = '#^13[\d]{9}$|^14[7]{1}\d{8}$|^15[^4]{1}\d{8}$|^17[3,6,7,8]{1}\d{8}$|^18[\d]{9}$|19[8,9]{1}\d{8}#';
+
+        if(preg_match($pattern,$mobile)){
+			if(preg_match($mobilePattern,$mobile)){
+				return 'China Mobile';
+			}elseif (preg_match($unicomPattern,$mobile)){
+				return 'China Unicom';
+			}elseif (preg_match($telecomPattern,$mobile)){
+				return 'China Telecom';
+			}else{
+				return 'Unknown T-MOBILE';
+			}
+		}else{
+        	return false;
+		}
     }
 
 
